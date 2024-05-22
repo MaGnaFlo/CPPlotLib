@@ -6,7 +6,7 @@
 
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    PythonWrapper wrapper("../python/lib/site-packages");
+    PythonWrapper wrapper;
     if (!wrapper.status()) {
         return QPixmap();
     }
@@ -49,10 +49,14 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     });
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-    std::unique_ptr<QImage> image = wrapper.execute();
+
+    // build image
+    ImageData imgData {wrapper.execute()};
+    QImage image {imgData.data.data(), imgData.width, imgData.height, imgData.width * 3, QImage::Format_RGB888};
+    
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     auto dt1 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     std::cout << " Script execution time: " << dt1 << " ms" << std::endl;
 
-    return QPixmap::fromImage(*image);
+    return QPixmap::fromImage(image);
 }

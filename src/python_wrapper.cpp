@@ -3,7 +3,7 @@
 #include <QDir>
 #include <sstream>
 
-PythonWrapper::PythonWrapper(const std::string& modulesRelativePath)
+PythonWrapper::PythonWrapper()
 {
     _status = true;
     // initialize interpreter
@@ -18,10 +18,7 @@ PythonWrapper::PythonWrapper(const std::string& modulesRelativePath)
     }
     std::stringstream ss;
     ss << QDir::currentPath().toStdString(); // < change to standard cpp
-    if (!modulesRelativePath.empty() && modulesRelativePath.front() != '/') {
-        ss << "/";
-    }
-    ss << modulesRelativePath;
+    ss << "/../python/lib/site-packages";
     const auto dirPath = ss.str();
     PyObject* modulesPath = PyUnicode_FromString(dirPath.c_str());
     if (!modulesPath) {
@@ -88,23 +85,23 @@ void PythonWrapper::setParameters(const std::unordered_map<std::string, std::str
     }
 }
 
-std::unique_ptr<QImage> PythonWrapper::execute()
+ImageData PythonWrapper::execute()
 {
     // declarations
-    std::unique_ptr<QImage> img {nullptr};
+    ImageData imgData;
     PyObject *pName, *pScript, *pFunc;
     PyObject *pArgs, *pValue;
     // load the module
     pName = PyUnicode_DecodeFSDefault(_scriptName.c_str());
     if (!pName){
         std::cerr << "Could not decode script file name.\n";
-        return nullptr;
+        return imgData;
     }
     pScript = PyImport_Import(pName);
     Py_DECREF(pName);
     if (!pScript) {
        std::cerr << "Failed to load script.\n";
-        return nullptr;
+        return imgData;
     }
     // load function
     pFunc = PyObject_GetAttrString(pScript, _functionName.c_str());
@@ -112,7 +109,7 @@ std::unique_ptr<QImage> PythonWrapper::execute()
     if (!pFunc || !PyCallable_Check(pFunc)) {
         if (PyErr_Occurred()) PyErr_Print();
         std::cerr << "Could not load function.\n";
-        return nullptr;
+        return imgData;
     }
     // format data
     PyObject* x_ = PyList_New(_xData.size());
@@ -159,23 +156,34 @@ std::unique_ptr<QImage> PythonWrapper::execute()
     if (pValue && PySequence_Check(pValue)) {
         if (!PySequence_GetItem(pValue, 0)) {
             std::cerr << "The returned sequence is empty\n.";
-            return nullptr;
+            return imgData;
         }
         // building image
-        int height = PySequence_Size(pValue);
-        int width = PySequence_Size(PySequence_GetItem(pValue, 0));
-        img = std::make_unique<QImage>(width, height, QImage::Format_RGB32);
-        for (int i = 0; i < height; i++) {
+        imgData.height = PySequence_Size(pValue);
+        imgData.width = PySequence_Size(PySequence_GetItem(pValue, 0));
+        imgData.resize();
+        for (int i = 0; i < imgData.height; i++) {
             PyObject* row = PySequence_GetItem(pValue, i);
             if (row) {
-                for (int j = 0; j < width; j++) {
+                for (int j = 0; j < imgData.width; j++) {
                     PyObject* pixel = PySequence_GetItem(row, j);
                     if (pixel) {
-                        img->setPixel(j, i, qRgb(PyLong_AsLong(PySequence_GetItem(pixel,0)), 
-                                                 PyLong_AsLong(PySequence_GetItem(pixel,1)), 
-                                                 PyLong_AsLong(PySequence_GetItem(pixel,2))));
+                        PyObject* r = PySequence_GetItem(pixel, 0);
+                        PyObject* g = PySequence_GetItem(pixel, 1);
+                        PyObject* b = PySequence_GetItem(pixel, 2);
+                        if (r && g && b) {
+                            int index {i * imgData.width * 3 + j * 3};
+                            imgData.data[index] = static_cast<unsigned char>(PyLong_AsLong(r));
+                            imgData.data[index+1] = static_cast<unsigned char>(PyLong_AsLong(g));
+                            imgData.data[index+2] = static_cast<unsigned char>(PyLong_AsLong(b));
+                        }
+                        Py_XDECREF(r);
+                        Py_XDECREF(g);
+                        Py_XDECREF(b);
+                        Py_DECREF(pixel);
                     }
                 }
+                Py_DECREF(row);
             }
         }
         Py_DECREF(pValue);
@@ -184,9 +192,10 @@ std::unique_ptr<QImage> PythonWrapper::execute()
         Py_DECREF(pScript);
         PyErr_Print();
         std::cerr << "Call failed\n";
-        return nullptr;
+        return imgData;
     }
     Py_XDECREF(pFunc);
     Py_DECREF(pScript);
-    return std::move(img);
+    // return std::move(img);
+    return imgData;
 }
