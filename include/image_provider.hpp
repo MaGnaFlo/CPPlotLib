@@ -3,7 +3,7 @@
 #include <QQuickImageProvider>
 #include <QPixmap>
 #include <vector>
-#include "python_wrapper.hpp"
+#include "cpplot.hpp"
 
 class ImageProvider : public QQuickImageProvider
 {
