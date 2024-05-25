@@ -5,7 +5,7 @@
 
 namespace plt
 {
-    LinePlot::LinePlot() : Plot("script", "plot")
+    LinePlot::LinePlot(Figure& figure) : Plot(figure, "script", "plot")
     {
         // default parameters
         _parameters = {{"dpi", "50"},
@@ -40,9 +40,9 @@ namespace plt
             PyList_SetItem(y_, i, PyFloat_FromDouble(_yData[i]));
         }
         // parameters
-        PyObject *dpi_ = PyUnicode_FromString(_parameters["dpi"].c_str());
-        PyObject *figwidth_ = PyUnicode_FromString(_parameters["figwidth"].c_str());
-        PyObject *figheight_ = PyUnicode_FromString(_parameters["figheight"].c_str());
+        PyObject *dpi_ = PyUnicode_FromString(std::to_string(_figure.dpi()).c_str());
+        PyObject *figwidth_ = PyUnicode_FromString(std::to_string(_figure.width()/_figure.dpi()).c_str());
+        PyObject *figheight_ = PyUnicode_FromString(std::to_string(_figure.height()/_figure.dpi()).c_str());
         PyObject *linecolor_ = PyUnicode_FromString(_parameters["linecolor"].c_str());
         PyObject *linewidth_ = PyUnicode_FromString(_parameters["linewidth"].c_str());
         PyObject *linestyle_ = PyUnicode_FromString(_parameters["linestyle"].c_str());

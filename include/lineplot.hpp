@@ -11,7 +11,7 @@ namespace plt
     class LinePlot : public Plot
     {
     public:
-        LinePlot();
+        LinePlot(Figure& figure);
         virtual ~LinePlot();
         virtual bool execute();
     };

@@ -5,8 +5,8 @@
 
 namespace plt
 {
-    Plot::Plot(const std::string &scriptName, const std::string &functionName)
-        : _scriptName(scriptName), _functionName(functionName)
+    Plot::Plot(Figure& figure, const std::string &scriptName, const std::string &functionName)
+        : _scriptName(scriptName), _functionName(functionName), _figure(figure)
     {
         _status = true;
         // initialize interpreter
@@ -128,16 +128,12 @@ namespace plt
             }
             else
             {
-                // building image
-                _plotImage.height = PySequence_Size(pResult);
-                _plotImage.width = PySequence_Size(PySequence_GetItem(pResult, 0));
-                _plotImage.resize();
-                for (int i = 0; i < _plotImage.height; i++)
+                for (int i = 0; i < _figure.height(); i++)
                 {
                     PyObject *pRow = PySequence_GetItem(pResult, i);
                     if (pRow)
                     {
-                        for (int j = 0; j < _plotImage.width; j++)
+                        for (int j = 0; j < _figure.width(); j++)
                         {
                             PyObject *pPixel = PySequence_GetItem(pRow, j);
                             if (pPixel)
@@ -147,10 +143,11 @@ namespace plt
                                 PyObject *pB = PySequence_GetItem(pPixel, 2);
                                 if (pR && pG && pB)
                                 {
-                                    int index{i * _plotImage.width * 3 + j * 3};
-                                    _plotImage.data[index] = static_cast<unsigned char>(PyLong_AsLong(pR));
-                                    _plotImage.data[index + 1] = static_cast<unsigned char>(PyLong_AsLong(pG));
-                                    _plotImage.data[index + 2] = static_cast<unsigned char>(PyLong_AsLong(pB));
+                                    int index{i * _figure.width() * 3 + j * 3};
+                                    int r = static_cast<unsigned char>(PyLong_AsLong(pR));
+                                    int g = static_cast<unsigned char>(PyLong_AsLong(pG));
+                                    int b = static_cast<unsigned char>(PyLong_AsLong(pB));
+                                    _figure.setPixel(index, r, g, b);
                                 }
                                 Py_XDECREF(pR);
                                 Py_XDECREF(pG);
@@ -170,6 +167,7 @@ namespace plt
             std::cerr << "Call failed.\n";
             rc = false;
         }
+        std::cout << "ok " << std::endl;
         Py_XDECREF(pFunction);
         return rc;
     }

@@ -5,10 +5,13 @@
 #include <ranges>
 #include <vector>
 #include "lineplot.hpp"
+#include "figure.hpp"
 
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    plt::LinePlot plot;
+    // figure
+    plt::Figure figure {1000, 500, 100};
+    plt::LinePlot plot {figure};
     if (!plot.status())
     {
         return QPixmap();
@@ -36,6 +39,7 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     const std::string xlabel{"The X axis"};
     const std::string ylabel{"The Y axis"};
 
+    // setting the plot
     plot.setXData(x);
     plot.setYData(y);
     plot.setParameters({{"dpi", std::to_string(dpi)},
@@ -62,8 +66,7 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     auto dt1 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     std::cout << " Script execution time: " << dt1 << " ms" << std::endl;
 
-    const auto &imgData{plot.image()};
-    QImage image{imgData.data.data(), imgData.width, imgData.height, imgData.width * 3, QImage::Format_RGB888};
+    QImage image{figure.data(), figure.width(), figure.height(), figure.width() * 3, QImage::Format_RGB888};
 
     return QPixmap::fromImage(image);
 }
