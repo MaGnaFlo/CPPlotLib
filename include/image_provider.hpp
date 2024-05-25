@@ -2,8 +2,6 @@
 
 #include <QQuickImageProvider>
 #include <QPixmap>
-#include <vector>
-#include "cpplot.hpp"
 
 class ImageProvider : public QQuickImageProvider
 {
