@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def plot(x, y, dpi, figwidth, figheight, linecolor, linewidth, linestyle, pointcolor, pointsize, grid, title, xlabel, ylabel):
-    fig, ax = plt.subplots(1,1,figsize=(int(figwidth), int(figheight)))
+    fig, ax = plt.subplots(1,1,figsize=(int(figwidth), int(figheight)), dpi=int(dpi))
     ax.plot(x, y, color=linecolor, lw=int(linewidth), ls=linestyle)
     ax.scatter(x, y, c=pointcolor, s=int(pointsize))
     ax.set_title(title)

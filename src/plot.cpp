@@ -167,7 +167,6 @@ namespace plt
             std::cerr << "Call failed.\n";
             rc = false;
         }
-        std::cout << "ok " << std::endl;
         Py_XDECREF(pFunction);
         return rc;
     }

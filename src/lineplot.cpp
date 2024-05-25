@@ -8,14 +8,11 @@ namespace plt
     LinePlot::LinePlot(Figure& figure) : Plot(figure, "script", "plot")
     {
         // default parameters
-        _parameters = {{"dpi", "50"},
-                       {"linecolor", "r"},
+        _parameters = {{"linecolor", "r"},
                        {"linewidth", "1"},
                        {"linestyle", "-"},
                        {"pointcolor", "r"},
                        {"pointsize", "0"},
-                       {"figwidth", "15"},
-                       {"figheight", "7"},
                        {"grid", "true"},
                        {"title", ""},
                        {"xlabel", ""},
@@ -40,9 +37,14 @@ namespace plt
             PyList_SetItem(y_, i, PyFloat_FromDouble(_yData[i]));
         }
         // parameters
-        PyObject *dpi_ = PyUnicode_FromString(std::to_string(_figure.dpi()).c_str());
-        PyObject *figwidth_ = PyUnicode_FromString(std::to_string(_figure.width()/_figure.dpi()).c_str());
-        PyObject *figheight_ = PyUnicode_FromString(std::to_string(_figure.height()/_figure.dpi()).c_str());
+        int dpi {_figure.dpi()};
+        while (_figure.width() % dpi != 0 || _figure.height() % dpi != 0)
+        {
+            dpi--; // automatic dpi adjustement. careful not to throw in some primes
+        }
+        PyObject *dpi_ = PyUnicode_FromString(std::to_string(dpi).c_str());
+        PyObject *figwidth_ = PyUnicode_FromString(std::to_string(_figure.width()/dpi).c_str());
+        PyObject *figheight_ = PyUnicode_FromString(std::to_string(_figure.height()/dpi).c_str());
         PyObject *linecolor_ = PyUnicode_FromString(_parameters["linecolor"].c_str());
         PyObject *linewidth_ = PyUnicode_FromString(_parameters["linewidth"].c_str());
         PyObject *linestyle_ = PyUnicode_FromString(_parameters["linestyle"].c_str());

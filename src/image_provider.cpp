@@ -10,7 +10,7 @@
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     // figure
-    plt::Figure figure {1000, 500, 100};
+    plt::Figure figure {1000, 500, 75};
     plt::LinePlot plot {figure};
     if (!plot.status())
     {
@@ -26,9 +26,6 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     std::vector<double> y(range.begin(), range.end());
 
     // parameters
-    constexpr int dpi{50};
-    constexpr int figwidth{15};
-    constexpr int figheight{7};
     const std::string linecolor{"r"};
     constexpr int linewidth{1};
     const std::string linestyle{"-"};
@@ -42,10 +39,7 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     // setting the plot
     plot.setXData(x);
     plot.setYData(y);
-    plot.setParameters({{"dpi", std::to_string(dpi)},
-                        {"figwidth", std::to_string(figwidth)},
-                        {"figheight", std::to_string(figheight)},
-                        {"linecolor", linecolor},
+    plot.setParameters({{"linecolor", linecolor},
                         {"linewidth", std::to_string(linewidth)},
                         {"linestyle", linestyle},
                         {"pointcolor", pointcolor},
