@@ -5,9 +5,26 @@
 
 namespace plt
 {
-    Plot::Plot(Figure& figure, const std::string &scriptName, const std::string &functionName)
-        : _scriptName(scriptName), _functionName(functionName), _figure(figure)
+    Plot::Plot(const std::string &scriptName,
+               const std::string &functionName,
+               int imgWidth,
+               int imgHeight,
+               int imgDpi,
+               const std::vector<double> &xData,
+               const std::vector<double> &yData,
+               const std::unordered_map<std::string, std::string> &parameters)
+        : _scriptName(scriptName),
+          _functionName(functionName),
+          _xData(xData),
+          _yData(yData),
+          _parameters(parameters)
     {
+
+        _imgData.width = imgWidth;
+        _imgData.height = imgHeight;
+        _imgData.dpi = imgDpi;
+        _imgData.data.resize(3 * imgWidth * imgHeight);
+
         _status = true;
         // initialize interpreter
         Py_Initialize();
@@ -109,10 +126,10 @@ namespace plt
             return false;
         }
 
-        return _buildFigure(pFunction, pArgs);
+        return _buildImage(pFunction, pArgs);
     }
 
-    bool Plot::_buildFigure(PyObject *pFunction, PyObject *pArgs)
+    bool Plot::_buildImage(PyObject *pFunction, PyObject *pArgs)
     {
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
@@ -128,12 +145,12 @@ namespace plt
             }
             else
             {
-                for (int i = 0; i < _figure.height(); i++)
+                for (int i = 0; i < _imgData.height; i++)
                 {
                     PyObject *pRow = PySequence_GetItem(pResult, i);
                     if (pRow)
                     {
-                        for (int j = 0; j < _figure.width(); j++)
+                        for (int j = 0; j < _imgData.width; j++)
                         {
                             PyObject *pPixel = PySequence_GetItem(pRow, j);
                             if (pPixel)
@@ -143,11 +160,11 @@ namespace plt
                                 PyObject *pB = PySequence_GetItem(pPixel, 2);
                                 if (pR && pG && pB)
                                 {
-                                    int index{i * _figure.width() * 3 + j * 3};
+                                    int index{i * _imgData.width * 3 + j * 3};
                                     int r = static_cast<unsigned char>(PyLong_AsLong(pR));
                                     int g = static_cast<unsigned char>(PyLong_AsLong(pG));
                                     int b = static_cast<unsigned char>(PyLong_AsLong(pB));
-                                    _figure.setPixel(index, r, g, b);
+                                    _imgData.setPixel(index, r, g, b);
                                 }
                                 Py_XDECREF(pR);
                                 Py_XDECREF(pG);

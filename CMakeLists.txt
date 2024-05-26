@@ -14,16 +14,16 @@ file(GLOB_RECURSE MOC_SOURCES include/*.hpp)
 add_executable(cpplotlib ${SRC_FILES} ${MOC_SOURCES})
 
 target_include_directories(cpplotlib
-PRIVATE 
-${Python_INCLUDE_DIRS}
-${CMAKE_CURRENT_SOURCE_DIR}/include)
+        PRIVATE
+        ${Python_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(cpplotlib 
-PRIVATE
-${Python_LIBRARIES}
-Qt6::Gui 
-Qt6::Widgets 
-Qt6::Quick)
+target_link_libraries(cpplotlib
+        PRIVATE
+        ${Python_LIBRARIES}
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Quick)
 
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS) # prevents clash between Qt slots and python.h
 set_target_properties(cpplotlib PROPERTIES AUTOMOC TRUE)

@@ -3,8 +3,7 @@
 #include <QQmlContext>
 #include "image_provider.hpp"
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QQmlApplicationEngine engine;

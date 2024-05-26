@@ -9,13 +9,11 @@
 
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    // figure
-    plt::Figure figure {1000, 500, 75};
-    plt::LinePlot plot {figure};
-    if (!plot.status())
-    {
-        return QPixmap();
-    }
+
+    // if (!plot.status())
+    // {
+    //     return QPixmap();
+    // }
 
     // data
     constexpr int n{40};
@@ -36,23 +34,24 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     const std::string xlabel{"The X axis"};
     const std::string ylabel{"The Y axis"};
 
-    // setting the plot
-    plot.setXData(x);
-    plot.setYData(y);
-    plot.setParameters({{"linecolor", linecolor},
-                        {"linewidth", std::to_string(linewidth)},
-                        {"linestyle", linestyle},
-                        {"pointcolor", pointcolor},
-                        {"pointsize", std::to_string(pointsize)},
-                        {"grid", std::to_string(grid)},
-                        {"title", title},
-                        {"xlabel", xlabel},
-                        {"ylabel", ylabel}});
+    const std::unordered_map<std::string, std::string> parameters{{"linecolor", linecolor},
+                                                                  {"linewidth", std::to_string(linewidth)},
+                                                                  {"linestyle", linestyle},
+                                                                  {"pointcolor", pointcolor},
+                                                                  {"pointsize", std::to_string(pointsize)},
+                                                                  {"grid", std::to_string(grid)},
+                                                                  {"title", title},
+                                                                  {"xlabel", xlabel},
+                                                                  {"ylabel", ylabel}};
+
+    // figure
+    plt::Figure figure{1200, 600, 100};
+    figure.addPlot(plt::PlotType::LINE, x, y, parameters);
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     // build image
-    if (!plot.execute())
+    if (!figure.plot())
     {
         return QPixmap();
     }
