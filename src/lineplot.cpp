@@ -5,13 +5,10 @@
 
 namespace plt
 {
-    LinePlot::LinePlot(int imgWidth,
-                       int imgHeight,
-                       int imgDpi,
-                       const std::vector<double> &xData,
+    LinePlot::LinePlot(const std::vector<double> &xData,
                        const std::vector<double> &yData,
                        const std::unordered_map<std::string, std::string> &parameters)
-        : Plot("script", "plot", imgWidth, imgHeight, imgDpi, xData, yData, parameters)
+        : Plot("script", "lineplot", xData, yData, parameters)
     {
         // default parameters
         const std::unordered_map<std::string, std::string> defaultParameters = {{"linecolor", "r"},
@@ -30,54 +27,28 @@ namespace plt
     {
     }
 
-    bool LinePlot::execute()
+    bool LinePlot::execute(PyObject* ax)
     {
-        // format data
-        PyObject *x_ = PyList_New(_xData.size());
-        for (int i = 0; i < _xData.size(); ++i)
-        {
-            PyList_SetItem(x_, i, PyFloat_FromDouble(_xData[i]));
+        PyObject* x = PyList_New(_xData.size());
+        PyObject* y = PyList_New(_yData.size());
+        for (size_t i = 0; i < _xData.size(); ++i) {
+            PyList_SetItem(x, i, PyFloat_FromDouble(_xData[i]));
         }
-        PyObject *y_ = PyList_New(_yData.size());
-        for (int i = 0; i < _yData.size(); ++i)
-        {
-            PyList_SetItem(y_, i, PyFloat_FromDouble(_yData[i]));
+        for (size_t i = 0; i < _yData.size(); ++i) {
+            PyList_SetItem(y, i, PyFloat_FromDouble(_yData[i]));
         }
-        // parameters
-        int dpi{_imgData.dpi};
-        while (_imgData.width % dpi != 0 || _imgData.height % dpi != 0)
-        {
-            dpi--; // automatic dpi adjustement. careful not to throw in some primes
-        }
-        PyObject *dpi_ = PyUnicode_FromString(std::to_string(dpi).c_str());
-        PyObject *figwidth_ = PyUnicode_FromString(std::to_string(_imgData.width / dpi).c_str());
-        PyObject *figheight_ = PyUnicode_FromString(std::to_string(_imgData.height / dpi).c_str());
-        PyObject *linecolor_ = PyUnicode_FromString(_parameters.at("linecolor").c_str());
-        PyObject *linewidth_ = PyUnicode_FromString(_parameters.at("linewidth").c_str());
-        PyObject *linestyle_ = PyUnicode_FromString(_parameters.at("linestyle").c_str());
-        PyObject *pointcolor_ = PyUnicode_FromString(_parameters.at("pointcolor").c_str());
-        PyObject *pointsize_ = PyUnicode_FromString(_parameters.at("pointsize").c_str());
-        PyObject *grid_ = PyUnicode_FromString(_parameters.at("grid").c_str());
-        PyObject *title_ = PyUnicode_FromString(_parameters.at("title").c_str());
-        PyObject *xlabel_ = PyUnicode_FromString(_parameters.at("xlabel").c_str());
-        PyObject *ylabel_ = PyUnicode_FromString(_parameters.at("ylabel").c_str());
-        PyObject *pArgs = Py_BuildValue("(OOOOOOOOOOOOOO)", x_,
-                                        y_,
-                                        dpi_,
-                                        figwidth_,
-                                        figheight_,
-                                        linecolor_,
-                                        linewidth_,
-                                        linestyle_,
-                                        pointcolor_,
-                                        pointsize_,
-                                        grid_,
-                                        title_,
-                                        xlabel_,
-                                        ylabel_);
 
-        Py_DECREF(x_);
-        Py_DECREF(y_);
+        PyObject* pLinecolor = PyUnicode_FromString(_parameters["linecolor"].c_str());
+        PyObject* pLinestyle = PyUnicode_FromString(_parameters["linestyle"].c_str());
+        PyObject* pLinewidth = PyLong_FromLong(std::stoi(_parameters["linewidth"]));
+        PyObject* pArgs = PyTuple_Pack(6, ax, x, y, pLinecolor, pLinewidth, pLinestyle);
+
+        Py_DECREF(x);
+        Py_DECREF(y);
+        Py_DECREF(pLinecolor);
+        Py_DECREF(pLinestyle);
+        Py_DECREF(pLinewidth);
+
         return _execute(pArgs);
     }
 }

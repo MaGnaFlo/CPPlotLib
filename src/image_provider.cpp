@@ -10,19 +10,6 @@
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
 
-    // if (!plot.status())
-    // {
-    //     return QPixmap();
-    // }
-
-    // data
-    constexpr int n{40};
-    std::vector<double> x(n);
-    std::iota(x.begin(), x.end(), 0);
-    auto range = x | std::views::transform([](double val)
-                                           { return sin(2 * M_PI * val / n); });
-    std::vector<double> y(range.begin(), range.end());
-
     // parameters
     const std::string linecolor{"r"};
     constexpr int linewidth{1};
@@ -44,14 +31,26 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
                                                                   {"xlabel", xlabel},
                                                                   {"ylabel", ylabel}};
 
+    // data
+    constexpr int n{40};
+    std::vector<double> x(n);
+    std::iota(x.begin(), x.end(), 0);
+    auto range = x | std::views::transform([](double val)
+                                           { return sin(2 * M_PI * val / n); });
+    std::vector<double> y(range.begin(), range.end());
+    auto range2 = x | std::views::transform([](double val)
+                                           { return cos(2 * M_PI * val / n); });
+    std::vector<double> y2(range2.begin(), range2.end());
+
     // figure
     plt::Figure figure{1200, 600, 100};
     figure.addPlot(plt::PlotType::LINE, x, y, parameters);
+    figure.addPlot(plt::PlotType::LINE, x, y2, {{"linecolor", "b"}});
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     // build image
-    if (!figure.plot())
+    if (!figure.build())
     {
         return QPixmap();
     }

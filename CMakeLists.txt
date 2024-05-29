@@ -8,10 +8,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Python 3.12 COMPONENTS Development REQUIRED)
 find_package(Qt6 6.2 COMPONENTS Quick Gui Widgets REQUIRED)
+set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 file(GLOB_RECURSE MOC_SOURCES include/*.hpp)
+
+set(PRE_BUILD_SCRIPT ${CMAKE_SOURCE_DIR}/pre_build.py)
+
 add_executable(cpplotlib ${SRC_FILES} ${MOC_SOURCES})
+
+add_custom_target(
+        run_script ALL
+        COMMAND python3 ${PRE_BUILD_SCRIPT}
+        #  BYPRODUCTS enums.h
+        COMMENT "Generating enums"
+)
+
+add_dependencies(cpplotlib run_script)
 
 target_include_directories(cpplotlib
         PRIVATE
