@@ -7,7 +7,6 @@
 
 namespace plt
 {
-
     class LinePlot : public Plot
     {
     public:
@@ -15,6 +14,6 @@ namespace plt
                  const std::vector<double> &yData,
                  const std::unordered_map<std::string, std::string> &parameters);
         virtual ~LinePlot();
-        virtual bool execute(PyObject* ax);
+        virtual void execute();
     };
 }

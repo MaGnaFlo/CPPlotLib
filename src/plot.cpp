@@ -1,16 +1,14 @@
 #include "plot.hpp"
 #include <iostream>
+#include <string>
+#include <sstream>
 
 namespace plt
 {
-    Plot::Plot(const std::string &scriptName,
-               const std::string &functionName,
-               const std::vector<double> &xData,
+    Plot::Plot(const std::vector<double> &xData,
                const std::vector<double> &yData,
                const std::unordered_map<std::string, std::string> &parameters)
-        : _scriptName(scriptName),
-          _functionName(functionName),
-          _xData(xData),
+        : _xData(xData),
           _yData(yData),
           _parameters(parameters)
     {
@@ -36,26 +34,26 @@ namespace plt
         }
     }
 
-    bool Plot::_execute(PyObject *pArgs)
+    std::vector<std::string> Plot::_buildArgs() const
     {
-        // Get a reference to the function
-        PyObject* scriptName = PyUnicode_FromString(_scriptName.c_str());
-        PyObject* scriptModule = PyImport_Import(scriptName);
-        Py_DECREF(scriptName);
+        std::vector<std::string> args;
+        std::ostringstream oss_x, oss_y;
+        oss_x << "[";
+        for (const auto x : _xData) oss_x << x << ",";
+        oss_x << "]";
+        oss_y << "[";
+        for (const auto y : _yData) oss_y << y << ",";
+        oss_y << "]";
 
-        PyObject* pFunction = PyObject_GetAttrString(scriptModule, _functionName.c_str());
-        PyObject* result = PyObject_CallObject(pFunction, pArgs);
-
-        // Clean up
-        Py_DECREF(pArgs);
-        Py_DECREF(pFunction);
-        Py_DECREF(scriptModule);
-
-        if (!result) {
-            PyErr_Print();
-            return false;
+        args.push_back(oss_x.str());
+        args.push_back(oss_y.str());
+        for (const auto& [key, value] : _parameters)
+        {
+            std::ostringstream oss_param;
+            oss_param << key << "=" << value;
+            args.push_back(oss_param.str());
         }
-        Py_DECREF(result);
-        return true;
+        return args;
+
     }
 }

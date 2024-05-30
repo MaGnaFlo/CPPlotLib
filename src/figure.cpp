@@ -84,49 +84,39 @@ namespace plt
 
     bool Figure::build()
     {
-        if (!_initializeInterpreter())
-        {
-            return false;
-        }
+        // initialize interpreter
+        
+        if (!_initializeInterpreter()) return false;
+        // automatic dpi adjustement. careful not to throw in some primes
+        while (_width % _dpi != 0 || _height % _dpi != 0) _dpi--;
 
-        while (_width % _dpi != 0 || _height % _dpi != 0)
-        {
-            _dpi--; // automatic dpi adjustement. careful not to throw in some primes
-        }
-
-        PyObject* mainModule = PyImport_AddModule("__main__");
-        PyObject* mainDict = PyModule_GetDict(mainModule);
-
+        // imports and figure
         std::ostringstream oss;
         oss << "import matplotlib.pyplot as plt\n"
             << "import numpy as np\n"
-            << "fig, ax = plt.subplots(figsize=(" 
+            << "fig, ax = plt.subplots(figsize=("
             << _width/_dpi << ", " 
             << _height/_dpi << "), dpi=" << _dpi << ")\n";
         PyRun_SimpleString(oss.str().c_str());
 
-        
-        PyObject* ax = PyDict_GetItemString(mainDict, "ax");
+        // execute all plots
+        for (const auto &plot : _plots) plot->execute();
 
-        bool rc {true};
-        for (const auto &plot : _plots)
-        {
-            rc = rc && plot->execute(ax);
-        }
-
+        // retrieve image
         oss.str("");
         oss << "fig.set_dpi(" << _dpi << ")\n"
             << "fig.canvas.draw()\n"
             << "img = np.frombuffer(fig.canvas.renderer.buffer_rgba(), dtype='uint8').reshape(" << _width << "," << _height << ", 4)\n";
-
         PyRun_SimpleString(oss.str().c_str());
-        
+        PyObject* mainModule = PyImport_AddModule("__main__");
+        PyObject* mainDict = PyModule_GetDict(mainModule);
         PyObject* pData = PyDict_GetItemString(mainDict, "img");
         
-        rc = rc && _buildImage(pData);
+        // build the image
+        bool rc = _buildImage(pData);
         
+        // close interpreter
         Py_Finalize();
-
         return rc;
     }
 

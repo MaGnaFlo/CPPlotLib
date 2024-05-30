@@ -8,18 +8,12 @@ namespace plt
     LinePlot::LinePlot(const std::vector<double> &xData,
                        const std::vector<double> &yData,
                        const std::unordered_map<std::string, std::string> &parameters)
-        : Plot("script", "lineplot", xData, yData, parameters)
+        : Plot(xData, yData, parameters)
     {
         // default parameters
-        const std::unordered_map<std::string, std::string> defaultParameters = {{"linecolor", "r"},
-                                                                                {"linewidth", "1"},
-                                                                                {"linestyle", "-"},
-                                                                                {"pointcolor", "r"},
-                                                                                {"pointsize", "0"},
-                                                                                {"grid", "true"},
-                                                                                {"title", ""},
-                                                                                {"xlabel", ""},
-                                                                                {"ylabel", ""}};
+        const std::unordered_map<std::string, std::string> defaultParameters = {{"color", "\"r\""},
+                                                                                {"lw", "1"},
+                                                                                {"ls", "\"-\""}};
         _parameters.insert(defaultParameters.begin(), defaultParameters.end());
     }
 
@@ -27,28 +21,13 @@ namespace plt
     {
     }
 
-    bool LinePlot::execute(PyObject* ax)
+    void LinePlot::execute()
     {
-        PyObject* x = PyList_New(_xData.size());
-        PyObject* y = PyList_New(_yData.size());
-        for (size_t i = 0; i < _xData.size(); ++i) {
-            PyList_SetItem(x, i, PyFloat_FromDouble(_xData[i]));
-        }
-        for (size_t i = 0; i < _yData.size(); ++i) {
-            PyList_SetItem(y, i, PyFloat_FromDouble(_yData[i]));
-        }
-
-        PyObject* pLinecolor = PyUnicode_FromString(_parameters["linecolor"].c_str());
-        PyObject* pLinestyle = PyUnicode_FromString(_parameters["linestyle"].c_str());
-        PyObject* pLinewidth = PyLong_FromLong(std::stoi(_parameters["linewidth"]));
-        PyObject* pArgs = PyTuple_Pack(6, ax, x, y, pLinecolor, pLinewidth, pLinestyle);
-
-        Py_DECREF(x);
-        Py_DECREF(y);
-        Py_DECREF(pLinecolor);
-        Py_DECREF(pLinestyle);
-        Py_DECREF(pLinewidth);
-
-        return _execute(pArgs);
+        const auto args {_buildArgs()};
+        std::ostringstream oss_script;
+        oss_script << "ax.plot(";
+        for (const auto& arg : args) oss_script << arg.c_str() << ",";
+        oss_script << ")\n";
+        PyRun_SimpleString(oss_script.str().c_str());
     }
 }

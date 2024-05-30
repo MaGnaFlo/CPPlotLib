@@ -11,9 +11,9 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
 {
 
     // parameters
-    const std::string linecolor{"r"};
+    const std::string linecolor{"\"r\""};
     constexpr int linewidth{1};
-    const std::string linestyle{"-"};
+    const std::string linestyle{"\"-\""};
     const std::string pointcolor{"b"};
     constexpr int pointsize{10};
     constexpr bool grid{false};
@@ -21,15 +21,9 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     const std::string xlabel{"The X axis"};
     const std::string ylabel{"The Y axis"};
 
-    const std::unordered_map<std::string, std::string> parameters{{"linecolor", linecolor},
-                                                                  {"linewidth", std::to_string(linewidth)},
-                                                                  {"linestyle", linestyle},
-                                                                  {"pointcolor", pointcolor},
-                                                                  {"pointsize", std::to_string(pointsize)},
-                                                                  {"grid", std::to_string(grid)},
-                                                                  {"title", title},
-                                                                  {"xlabel", xlabel},
-                                                                  {"ylabel", ylabel}};
+    const std::unordered_map<std::string, std::string> parameters{{"color", linecolor},
+                                                                  {"lw", std::to_string(linewidth)},
+                                                                  {"ls", linestyle}};
 
     // data
     constexpr int n{40};
@@ -45,7 +39,7 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     // figure
     plt::Figure figure{1200, 600, 100};
     figure.addPlot(plt::PlotType::LINE, x, y, parameters);
-    figure.addPlot(plt::PlotType::LINE, x, y2, {{"linecolor", "b"}});
+    figure.addPlot(plt::PlotType::LINE, x, y2, {{"color", "\"b\""}});
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
