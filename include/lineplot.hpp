@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Python.h>
-#include <vector>
-#include <unordered_map>
 #include "plot.hpp"
 
 namespace plt
@@ -13,7 +10,11 @@ namespace plt
         LinePlot(const std::vector<double> &xData,
                  const std::vector<double> &yData,
                  const std::unordered_map<std::string, std::string> &parameters);
-        virtual ~LinePlot();
+        virtual ~LinePlot() = default;
+        LinePlot(LinePlot&) = delete;
+        LinePlot& operator=(LinePlot&) = delete;
+        LinePlot(LinePlot&&) = delete;
+        LinePlot& operator=(LinePlot&&) = delete;
         virtual void execute();
     };
 }

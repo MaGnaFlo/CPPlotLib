@@ -13,12 +13,10 @@ namespace plt
         // default parameters
         const std::unordered_map<std::string, std::string> defaultParameters = {{"color", "\"r\""},
                                                                                 {"lw", "1"},
-                                                                                {"ls", "\"-\""}};
+                                                                                {"ls", "\"-\""},
+                                                                                {"alpha", "1"}};
         _parameters.insert(defaultParameters.begin(), defaultParameters.end());
-    }
-
-    LinePlot::~LinePlot()
-    {
+        _setParameters(parameters);
     }
 
     void LinePlot::execute()

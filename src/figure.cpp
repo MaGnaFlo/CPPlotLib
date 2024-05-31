@@ -1,5 +1,6 @@
 #include "figure.hpp"
 #include "lineplot.hpp"
+#include "scatterplot.hpp"
 #include <iostream>
 #include <sstream>
 #include <filesystem>
@@ -27,6 +28,7 @@ namespace plt
             break;
 
         case PlotType::SCATTER:
+            _plots.push_back(std::make_unique<ScatterPlot>(xData, yData, parameters));
             break;
 
         case PlotType::BAR:
@@ -63,22 +65,6 @@ namespace plt
             std::cerr << "Failed to append modules path to sys.path\n";
             return false;
         }
-
-        // append the directory containing the scripts
-        const std::string scripts_path{"../scripts/"};
-        PyObject *scriptsPath{PyUnicode_FromString(scripts_path.c_str())};
-        if (!scriptsPath)
-        {
-            std::cerr << "Failed to create scripts path\n";
-            return false;
-        }
-        result = PyList_Append(sysPath, scriptsPath);
-        Py_DECREF(scriptsPath);
-        if (result == -1)
-        {
-            std::cerr << "Failed to append modules path to sys.path\n";
-            return false;
-        }
         return true;
     }
 
@@ -90,7 +76,7 @@ namespace plt
         // automatic dpi adjustement. careful not to throw in some primes
         while (_width % _dpi != 0 || _height % _dpi != 0) _dpi--;
 
-        // imports and figure
+        // imports and figure (imports are greedy : ~400 ms)
         std::ostringstream oss;
         oss << "import matplotlib.pyplot as plt\n"
             << "import numpy as np\n"

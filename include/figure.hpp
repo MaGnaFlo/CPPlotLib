@@ -18,7 +18,7 @@ namespace plt
         void addPlot(PlotType type,
                      const std::vector<double> &xData,
                      const std::vector<double> &yData,
-                     const std::unordered_map<std::string, std::string> &parameters);
+                     const std::unordered_map<std::string, std::string> &parameters = {});
         bool build();
 
     private:
