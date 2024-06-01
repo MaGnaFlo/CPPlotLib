@@ -15,7 +15,7 @@ namespace plt
 
     }
 
-    void Plot::_setParameters(const std::unordered_map<std::string, std::string> parameters)
+    void Plot::_setParameters(const std::unordered_map<std::string, std::string>& parameters)
     {
         for (const auto &[name, value] : parameters)
         {

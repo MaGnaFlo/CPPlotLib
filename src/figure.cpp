@@ -1,6 +1,7 @@
 #include "figure.hpp"
 #include "lineplot.hpp"
 #include "scatterplot.hpp"
+#include "barplot.hpp"
 #include <iostream>
 #include <sstream>
 #include <filesystem>
@@ -32,6 +33,7 @@ namespace plt
             break;
 
         case PlotType::BAR:
+            _plots.push_back(std::make_unique<BarPlot>(xData, yData, parameters));
             break;
         }
     }

@@ -15,6 +15,6 @@ namespace plt
         ScatterPlot& operator=(ScatterPlot&) = delete;
         ScatterPlot(ScatterPlot&&) = delete;
         ScatterPlot& operator=(ScatterPlot&&) = delete;
-        virtual void execute();
+        virtual void execute() override;
     };
 }

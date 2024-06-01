@@ -15,6 +15,6 @@ namespace plt
         LinePlot& operator=(LinePlot&) = delete;
         LinePlot(LinePlot&&) = delete;
         LinePlot& operator=(LinePlot&&) = delete;
-        virtual void execute();
+        virtual void execute() override;
     };
 }
