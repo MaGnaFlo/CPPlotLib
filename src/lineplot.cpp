@@ -21,10 +21,10 @@ namespace plt
 
     void LinePlot::execute()
     {
-        const auto args {_buildArgs()};
+        const auto args{_buildArgs()};
         std::ostringstream oss_script;
         oss_script << "ax.plot(";
-        for (const auto& arg : args) oss_script << arg.c_str() << ",";
+        for (const auto &arg : args) oss_script << arg.c_str() << ",";
         oss_script << ")\n";
         PyRun_SimpleString(oss_script.str().c_str());
     }

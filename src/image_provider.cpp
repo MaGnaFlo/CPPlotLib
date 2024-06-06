@@ -17,24 +17,25 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
                                            { return sin(2 * M_PI * val / n); });
     std::vector<double> y(range.begin(), range.end());
     auto range2 = x | std::views::transform([](double val)
-                                           { return cos(2 * M_PI * val / n); });
+                                            { return cos(2 * M_PI * val / n); });
     std::vector<double> y2(range2.begin(), range2.end());
 
     // figure
     plt::Figure figure{1200, 600, 100};
     // figure.addPlot(plt::PlotType::LINE, x, y);
     // figure.addPlot(plt::PlotType::LINE, x, y2, {{"color", "\"b\""}});
-    // figure.addPlot(plt::PlotType::SCATTER, x, y2, {{"c", "\"yellow\""}, 
+    // figure.addPlot(plt::PlotType::SCATTER, x, y2, {{"c", "\"yellow\""},
     //                                                {"edgecolor", "\"k\""},
     //                                                {"s", "500"}});
-    std::vector<double> x_bar {{0,1,2,3}};
-    std::vector<double> y_bar {{20,10,5,15}};
+    std::vector<double> x_bar{{0, 1, 2, 3}};
+    std::vector<double> y_bar{{20, 10, 5, 15}};
     figure.addPlot(plt::PlotType::BAR, x_bar, y_bar);
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     // build image
-    if (!figure.build()) return QPixmap();
+    if (!figure.build())
+        return QPixmap();
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     auto dt1 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     std::cout << " Script execution time: " << dt1 << " ms" << std::endl;

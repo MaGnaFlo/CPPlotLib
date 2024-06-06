@@ -38,7 +38,7 @@ namespace plt
         }
     }
 
-    bool Figure::_initializeInterpreter()
+    bool Figure::_initializeInterpreter() const
     {
         // initialize interpreter
         Py_Initialize();
@@ -73,22 +73,25 @@ namespace plt
     bool Figure::build()
     {
         // initialize interpreter
-        
-        if (!_initializeInterpreter()) return false;
+
+        if (!_initializeInterpreter())
+            return false;
         // automatic dpi adjustement. careful not to throw in some primes
-        while (_width % _dpi != 0 || _height % _dpi != 0) _dpi--;
+        while (_width % _dpi != 0 || _height % _dpi != 0)
+            _dpi--;
 
         // imports and figure (imports are greedy : ~400 ms)
         std::ostringstream oss;
         oss << "import matplotlib.pyplot as plt\n"
             << "import numpy as np\n"
             << "fig, ax = plt.subplots(figsize=("
-            << _width/_dpi << ", " 
-            << _height/_dpi << "), dpi=" << _dpi << ")\n";
+            << _width / _dpi << ", "
+            << _height / _dpi << "), dpi=" << _dpi << ")\n";
         PyRun_SimpleString(oss.str().c_str());
 
         // execute all plots
-        for (const auto &plot : _plots) plot->execute();
+        for (const auto &plot : _plots)
+            plot->execute();
 
         // retrieve image
         oss.str("");
@@ -96,21 +99,28 @@ namespace plt
             << "fig.canvas.draw()\n"
             << "img = np.frombuffer(fig.canvas.renderer.buffer_rgba(), dtype='uint8').reshape(" << _width << "," << _height << ", 4)\n";
         PyRun_SimpleString(oss.str().c_str());
-        PyObject* mainModule = PyImport_AddModule("__main__");
-        PyObject* mainDict = PyModule_GetDict(mainModule);
-        PyObject* pData = PyDict_GetItemString(mainDict, "img");
-        
+        PyObject *mainModule = PyImport_AddModule("__main__");
+        PyObject *mainDict = PyModule_GetDict(mainModule);
+        PyObject *pData = PyDict_GetItemString(mainDict, "img");
+
         // build the image
         bool rc = _buildImage(pData);
-        
+
         // close interpreter
         Py_Finalize();
         return rc;
     }
 
-    bool Figure::_buildImage(PyObject* pData)
+    void Figure::_setPixel(int i, int r, int g, int b)
     {
-        bool rc {true};
+        _imageData[i] = r;
+        _imageData[i + 1] = g;
+        _imageData[i + 2] = b;
+    }
+
+    bool Figure::_buildImage(PyObject *pData)
+    {
+        bool rc{true};
         if (pData && PySequence_Check(pData))
         {
             if (!PySequence_GetItem(pData, 0))

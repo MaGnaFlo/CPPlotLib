@@ -6,8 +6,8 @@
 namespace plt
 {
     BarPlot::BarPlot(const std::vector<double> &xData,
-                       const std::vector<double> &yData,
-                       const std::unordered_map<std::string, std::string> &parameters)
+                     const std::vector<double> &yData,
+                     const std::unordered_map<std::string, std::string> &parameters)
         : Plot(xData, yData, parameters)
     {
         // default parameters
@@ -22,7 +22,7 @@ namespace plt
         _setParameters(parameters);
     }
 
-    void BarPlot::_setParameters(const std::unordered_map<std::string, std::string>& parameters)
+    void BarPlot::_setParameters(const std::unordered_map<std::string, std::string> &parameters)
     {
         for (const auto &[name, value] : parameters)
         {
@@ -34,29 +34,28 @@ namespace plt
             }
             _parameters[name] = value;
         }
-        const auto it_ticklabel {parameters.find("tick_label")};
+        const auto it_ticklabel{parameters.find("tick_label")};
         if (it_ticklabel != parameters.end())
         {
-            const std::string& value {(*it_ticklabel).second};
-            std::istringstream iss {value.c_str()};
+            const std::string &value{(*it_ticklabel).second};
+            std::istringstream iss{value.c_str()};
             size_t count;
-            std::string s;
-            while (std::getline(iss, s, ',')) count++;
-            if (count != _xData.size()) 
+            std::string dummy;
+            while (std::getline(iss, dummy, ',')) count++;
+            if (count != _xData.size())
             {
                 std::cerr << "Parameter 'tick_label' must have the same length as data" << std::endl;
                 _parameters["tick_label"] = "None";
             }
         }
-
     }
 
     void BarPlot::execute()
     {
-        const auto args {_buildArgs()};
+        const auto args{_buildArgs()};
         std::ostringstream oss_script;
         oss_script << "ax.bar(";
-        for (const auto& arg : args) oss_script << arg.c_str() << ",";
+        for (const auto &arg : args) oss_script << arg.c_str() << ",";
         oss_script << ")\n";
         PyRun_SimpleString(oss_script.str().c_str());
     }

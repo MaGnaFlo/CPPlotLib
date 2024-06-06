@@ -12,10 +12,9 @@ namespace plt
           _yData(yData),
           _parameters(parameters)
     {
-
     }
 
-    void Plot::_setParameters(const std::unordered_map<std::string, std::string>& parameters)
+    void Plot::_setParameters(const std::unordered_map<std::string, std::string> &parameters)
     {
         for (const auto &[name, value] : parameters)
         {
@@ -34,21 +33,22 @@ namespace plt
         std::vector<std::string> args;
         std::ostringstream oss_x, oss_y;
         oss_x << "[";
-        for (const auto x : _xData) oss_x << x << ",";
+        for (const auto x : _xData)
+            oss_x << x << ",";
         oss_x << "]";
         oss_y << "[";
-        for (const auto y : _yData) oss_y << y << ",";
+        for (const auto y : _yData)
+            oss_y << y << ",";
         oss_y << "]";
 
         args.push_back(oss_x.str());
         args.push_back(oss_y.str());
-        for (const auto& [key, value] : _parameters)
+        for (const auto &[key, value] : _parameters)
         {
             std::ostringstream oss_param;
             oss_param << key << "=" << value;
             args.push_back(oss_param.str());
         }
         return args;
-
     }
 }
