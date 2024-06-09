@@ -1,7 +1,4 @@
 #include "figure.hpp"
-#include "lineplot.hpp"
-#include "scatterplot.hpp"
-#include "barplot.hpp"
 #include <iostream>
 #include <sstream>
 #include <filesystem>
@@ -15,27 +12,6 @@ namespace plt
         _height = height;
         _dpi = dpi;
         _imageData.resize(3 * width * height);
-    }
-
-    void Figure::addPlot(PlotType type,
-                         const std::vector<double> &xData,
-                         const std::vector<double> &yData,
-                         const std::unordered_map<std::string, std::string> &parameters)
-    {
-        switch (type)
-        {
-        case PlotType::LINE:
-            _plots.push_back(std::make_unique<LinePlot>(xData, yData, parameters));
-            break;
-
-        case PlotType::SCATTER:
-            _plots.push_back(std::make_unique<ScatterPlot>(xData, yData, parameters));
-            break;
-
-        case PlotType::BAR:
-            _plots.push_back(std::make_unique<BarPlot>(xData, yData, parameters));
-            break;
-        }
     }
 
     bool Figure::_initializeInterpreter() const

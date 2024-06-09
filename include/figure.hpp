@@ -2,6 +2,10 @@
 
 #include <vector>
 #include "plot.hpp"
+#include "lineplot.hpp"
+#include "scatterplot.hpp"
+#include "barplot.hpp"
+#include <string_view>
 
 namespace plt
 {
@@ -33,10 +37,44 @@ namespace plt
         /// @param xData Data abscissae
         /// @param yData Data ordinates
         /// @param parameters Plot parameters
+        template <Numerical U, Numerical V>
         void addPlot(PlotType type,
-                     const std::vector<double> &xData,
-                     const std::vector<double> &yData,
-                     const std::unordered_map<std::string, std::string> &parameters = {});
+                     const std::vector<U> &xData,
+                     const std::vector<V> &yData,
+                     const std::unordered_map<std::string, std::string> &parameters = {})
+        {
+            switch (type)
+            {
+            case PlotType::LINE:
+                _plots.push_back(std::make_unique<LinePlot<U,V>>(xData, yData, parameters));
+                break;
+
+            case PlotType::SCATTER:
+                _plots.push_back(std::make_unique<ScatterPlot<U, V>>(xData, yData, parameters));
+                break;
+
+            case PlotType::BAR:
+                _plots.push_back(std::make_unique<BarPlot<U,V>>(xData, yData, parameters));
+                break;
+            }
+        }
+        
+        template <StringLike U, Numerical V>
+        void addPlot(PlotType type,
+                     const std::vector<U> &xData,
+                     const std::vector<V> &yData,
+                     const std::unordered_map<std::string, std::string> &parameters = {})
+        {
+            switch (type)
+            {
+            case PlotType::LINE: break;
+            case PlotType::SCATTER: break;
+            case PlotType::BAR:
+                _plots.push_back(std::make_unique<BarPlot<U,V>>(xData, yData, parameters));
+                break;
+            }
+        }
+
         /// @brief Calls the execution of the plots and builds the image
         /// @return true if all went well
         bool build();
@@ -56,7 +94,7 @@ namespace plt
         /// @param b Blue channel
         void _setPixel(int i, int r, int g, int b);
         /// @brief Vector of all the plots to be displayed
-        std::vector<std::unique_ptr<Plot>> _plots;
+        std::vector<std::unique_ptr<IPlot>> _plots;
         /// @brief Data array of the image (size width x height x 3)
         std::vector<unsigned char> _imageData;
         /// @brief Figure width
