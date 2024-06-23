@@ -18,8 +18,10 @@ namespace plt
         BAR
     };
 
-    template <class T> concept Numerical = std::integral<T> || std::floating_point<T>;
-    template<class T> concept StringLike = std::is_convertible_v<T, std::string_view>;
+    template <class T>
+    concept Numerical = std::integral<T> || std::floating_point<T>;
+    template <class T>
+    concept StringLike = std::is_convertible_v<T, std::string_view>;
 
     /// @brief Plot interface
     class IPlot

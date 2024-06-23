@@ -32,6 +32,18 @@ namespace plt
         /// @brief Image data, as a byte array of size width x height x 3
         /// @return Image data byte array
         const unsigned char *data() const { return _imageData.data(); }
+        /// @brief Set grid visibility
+        /// @param grid true if visible
+        void setGrid(bool grid) { _grid = grid; }
+        /// @brief Set the x-axis label
+        /// @param xlabel Label string
+        void setXLabel(const std::string& xlabel) { _xlabel = xlabel;}
+        /// @brief Set the y-axis label
+        /// @param ylabel Label string
+        void setYLabel(const std::string& ylabel) { _ylabel = ylabel;}
+        /// @brief Set the figure title
+        /// @param title Title string
+        void setTitle(const std::string& title) { _title = title;}
         /// @brief Adds a plot to the figure
         /// @param type Plot type (eg. LinePlot, ScatterPlot, BarPlot)
         /// @param xData Data abscissae
@@ -46,7 +58,7 @@ namespace plt
             switch (type)
             {
             case PlotType::LINE:
-                _plots.push_back(std::make_unique<LinePlot<U,V>>(xData, yData, parameters));
+                _plots.push_back(std::make_unique<LinePlot<U, V>>(xData, yData, parameters));
                 break;
 
             case PlotType::SCATTER:
@@ -54,11 +66,11 @@ namespace plt
                 break;
 
             case PlotType::BAR:
-                _plots.push_back(std::make_unique<BarPlot<U,V>>(xData, yData, parameters));
+                _plots.push_back(std::make_unique<BarPlot<U, V>>(xData, yData, parameters));
                 break;
             }
         }
-        
+
         template <StringLike U, Numerical V>
         void addPlot(PlotType type,
                      const std::vector<U> &xData,
@@ -67,10 +79,12 @@ namespace plt
         {
             switch (type)
             {
-            case PlotType::LINE: break;
-            case PlotType::SCATTER: break;
+            case PlotType::LINE:
+                break;
+            case PlotType::SCATTER:
+                break;
             case PlotType::BAR:
-                _plots.push_back(std::make_unique<BarPlot<U,V>>(xData, yData, parameters));
+                _plots.push_back(std::make_unique<BarPlot<U, V>>(xData, yData, parameters));
                 break;
             }
         }
@@ -103,5 +117,13 @@ namespace plt
         int _height = 0;
         /// @brief Figure dpi
         int _dpi = 50;
+        /// @brief Grid visibility
+        bool _grid = false;
+        /// @brief x-axis label
+        std::string _xlabel;
+        /// @brief y-axis label
+        std::string _ylabel;
+        /// @brief figure title
+        std::string _title;
     };
 }

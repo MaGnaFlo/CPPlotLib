@@ -31,6 +31,10 @@ QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize
     std::vector<std::string> x_bar{{"0", "1", "2", "3"}};
     std::vector<double> y_bar{{20, 10, 5, 15}};
     figure.addPlot(plt::PlotType::BAR, x_bar, y_bar);
+    figure.setGrid(true);
+    figure.setXLabel("x label");
+    figure.setYLabel("y label");
+    figure.setTitle("title");
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 

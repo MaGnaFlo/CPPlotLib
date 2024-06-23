@@ -71,7 +71,11 @@ namespace plt
 
         // retrieve image
         oss.str("");
-        oss << "fig.set_dpi(" << _dpi << ")\n"
+        oss << "ax.grid(" << static_cast<int>(_grid) << ")\n"
+            << "ax.set_xlabel(\"" << _xlabel << "\")\n"
+            << "ax.set_ylabel(\"" << _ylabel << "\")\n"
+            << "ax.set_title(\"" << _title << "\")\n"
+            << "fig.set_dpi(" << _dpi << ")\n"
             << "fig.canvas.draw()\n"
             << "img = np.frombuffer(fig.canvas.renderer.buffer_rgba(), dtype='uint8').reshape(" << _width << "," << _height << ", 4)\n";
         PyRun_SimpleString(oss.str().c_str());
