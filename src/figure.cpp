@@ -26,9 +26,12 @@ namespace plt
             std::cerr << "Failed to get sys.path\n";
             return false;
         }
+
+        constexpr char const* modulesFolderName {"python_modules"};
         std::stringstream ss;
-        ss << std::filesystem::current_path().string();
-        ss << "/../python/lib/site-packages";
+        ss << std::filesystem::current_path().string() + "/";
+        ss << modulesFolderName << "/lib/python" << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << "/site-packages";
+
         const auto dirPath = ss.str();
         PyObject *modulesPath = PyUnicode_FromString(dirPath.c_str());
         if (!modulesPath)
@@ -49,7 +52,6 @@ namespace plt
     bool Figure::build()
     {
         // initialize interpreter
-
         if (!_initializeInterpreter())
             return false;
         // automatic dpi adjustement. careful not to throw in some primes

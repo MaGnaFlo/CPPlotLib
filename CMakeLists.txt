@@ -6,9 +6,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Python 3.12 COMPONENTS Development REQUIRED)
 find_package(Qt6 6.2 COMPONENTS Quick Gui Widgets REQUIRED)
-set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+find_package(Python 3.12 COMPONENTS Development Interpreter REQUIRED)
+
+# virtual environment modules
+execute_process(COMMAND ${Python_EXECUTABLE} -m venv ${CMAKE_CURRENT_BINARY_DIR}/python_modules)
+execute_process(COMMAND ${CMAKE_CURRENT_BINARY_DIR}/python_modules/bin/pip install numpy matplotlib)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 file(GLOB_RECURSE MOC_SOURCES include/*.hpp)
