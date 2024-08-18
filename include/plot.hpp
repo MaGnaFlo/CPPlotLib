@@ -15,7 +15,8 @@ namespace plt
     {
         LINE,
         SCATTER,
-        BAR
+        BAR,
+        PIE
     };
 
     template <class T>

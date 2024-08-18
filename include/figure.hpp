@@ -5,6 +5,7 @@
 #include "lineplot.hpp"
 #include "scatterplot.hpp"
 #include "barplot.hpp"
+#include "pieplot.hpp"
 #include <string_view>
 
 namespace plt
@@ -68,6 +69,9 @@ namespace plt
             case PlotType::BAR:
                 _plots.push_back(std::make_unique<BarPlot<U, V>>(xData, yData, parameters));
                 break;
+
+            case PlotType::PIE:
+                break;
             }
         }
 
@@ -85,6 +89,27 @@ namespace plt
                 break;
             case PlotType::BAR:
                 _plots.push_back(std::make_unique<BarPlot<U, V>>(xData, yData, parameters));
+                break;
+            case PlotType::PIE:
+                break;
+            }
+        }
+
+        template <Numerical U>
+        void addPlot(PlotType type,
+                     const std::vector<U> &xData,
+                     const std::unordered_map<std::string, std::string> &parameters = {})
+        {
+            switch (type)
+            {
+            case PlotType::LINE:
+                break;
+            case PlotType::SCATTER:
+                break;
+            case PlotType::BAR:
+                break;
+            case PlotType::PIE:
+                _plots.push_back(std::make_unique<PiePlot<U>>(xData, parameters));
                 break;
             }
         }
