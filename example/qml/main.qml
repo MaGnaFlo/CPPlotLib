@@ -1,5 +1,4 @@
 import QtQuick
-import QtCharts 2.7
 
 Window {
     id: root
@@ -14,6 +13,6 @@ Window {
     Image {
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
-        source: "image://colors/yellow"
+        source: "image://image/yellow"
     }
 }

@@ -1,4 +1,4 @@
-#include "figure.hpp"
+#include "cpplotlib/figure.hpp"
 #include <iostream>
 #include <sstream>
 #include <filesystem>

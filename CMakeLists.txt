@@ -1,42 +1,70 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.9)
 
-project(CPPlotLib VERSION 1.0 LANGUAGES CXX)
-
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick Gui Widgets REQUIRED)
-find_package(Python 3.12 COMPONENTS Development Interpreter REQUIRED)
+project(CPPlotLib VERSION 1.0 DESCRIPTION "CPPlotLib library")
 
-# virtual environment modules
-execute_process(COMMAND ${Python_EXECUTABLE} -m venv ${CMAKE_CURRENT_BINARY_DIR}/python_modules)
-execute_process(COMMAND ${CMAKE_CURRENT_BINARY_DIR}/python_modules/bin/pip install numpy matplotlib)
+include(GNUInstallDirs)
 
-file(GLOB_RECURSE SRC_FILES src/*.cpp)
-file(GLOB_RECURSE MOC_SOURCES include/*.hpp)
+find_package(Python 3.12 COMPONENTS Development REQUIRED)
 
-add_executable(cpplotlib ${SRC_FILES} ${MOC_SOURCES})
+# library
+add_library(CPPlotLib SHARED
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/figure.cpp)
 
-target_include_directories(cpplotlib
-        PRIVATE
-        ${Python_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# includes
+target_include_directories(CPPlotLib PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cpplotlib>
+    ${Python_INCLUDE_DIRS}
+)
 
-target_link_libraries(cpplotlib
-        PRIVATE
-        ${Python_LIBRARIES}
-        Qt6::Gui
-        Qt6::Widgets
-        Qt6::Quick)
+# Python library
+target_link_libraries(CPPlotLib PRIVATE ${Python_LIBRARIES})
 
-ADD_DEFINITIONS(-DQT_NO_KEYWORDS) # prevents clash between Qt slots and python.h
-set_target_properties(cpplotlib PROPERTIES AUTOMOC TRUE)
+# library properties
+set_target_properties(CPPlotLib PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+    PUBLIC_HEADER "include/cpplotlib/figure.hpp;include/cpplotlib/plot.hpp;include/cpplotlib/lineplot.hpp;include/cpplotlib/scatterplot.hpp;include/cpplotlib/barplot.hpp;include/cpplotlib/pieplot.hpp"
+)
 
-qt_policy(SET QTP0001 NEW)
+# install library, headers, and CMake config files
+install(TARGETS CPPlotLib
+        EXPORT CPPlotLibTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpplotlib)
 
-qt_add_qml_module(cpplotlib
-        URI cpplotlib_ui
-        VERSION 1.0
-        QML_FILES qml/main.qml
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cpplotlib
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpplotlib
+    FILES_MATCHING PATTERN "*.hpp"
+)
+
+# install the exported targets file
+install(EXPORT CPPlotLibTargets
+        FILE CPPlotLibTargets.cmake
+        NAMESPACE CPPlotLib::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CPPlotLib)
+
+# ConfigVersion file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/CPPlotLibConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+# main Config file
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/CPPlotLibConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CPPlotLib
+)
+
+# Install the Config and Version files
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/CPPlotLibConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/CPPlotLibConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CPPlotLib
 )

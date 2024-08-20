@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/CPPlotLibTargets.cmake")
+
+# This line finds and includes any dependencies
+find_dependency(Python 3.12 REQUIRED)
+

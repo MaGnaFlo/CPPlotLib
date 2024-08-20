@@ -4,8 +4,13 @@
 #include <cmath>
 #include <ranges>
 #include <vector>
-#include "lineplot.hpp"
-#include "figure.hpp"
+
+#include <cpplotlib/figure.hpp>
+#include <cpplotlib/pieplot.hpp>
+#include <cpplotlib/scatterplot.hpp>
+#include <cpplotlib/lineplot.hpp>
+#include <cpplotlib/barplot.hpp>
+
 
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
