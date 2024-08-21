@@ -29,7 +29,13 @@ namespace plt
 
         constexpr char const* modulesFolderName {"python_modules"};
         std::stringstream ss;
-        ss << std::filesystem::current_path().string() + "/";
+        auto rootDir {std::filesystem::current_path()};
+
+        // if the build occurs on MacOs, then take the grandparent path
+        #ifdef __APPLE__
+        rootDir = rootDir.parent_path().parent_path().parent_path();
+        #endif
+        ss << rootDir.string() + "/";
         ss << modulesFolderName << "/lib/python" << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << "/site-packages";
 
         const auto dirPath = ss.str();
