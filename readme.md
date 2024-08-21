@@ -1,8 +1,19 @@
 # CPPlotLib
 
-CPPlotlib is a simple C++ API to plot figures in the same way Python's matplotlib does.
+CPPlotlib is a simple C++ API to plot figures using Python's matplotlib. It naturally uses the Python interpreter in background.
 
-## Line and scatter plots
+## Installation
+Assuming creating _build_ in the same folder as the CMakeLists.txt:
+```bash
+cmake ..
+make
+sudo make install
+```
+
+## Examples
+The example provided uses QML to display the resulting figure.
+
+### Line and scatter plots
 
 ```cpp
 // data
@@ -36,7 +47,7 @@ auto figure_data {figure.data()};
 ```
 ![alt text](https://github.com/MaGnaFlo/CPPlotLib/blob/master/screenshots/line_scatter.png)
 
-## Bar plot
+### Bar plot
 
 ```cpp
 // data
