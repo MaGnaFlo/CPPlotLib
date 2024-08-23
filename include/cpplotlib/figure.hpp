@@ -21,6 +21,10 @@ namespace plt
         Figure(int width, int height, int dpi = 50);
         /// @brief Figure destructor
         ~Figure() = default;
+        /// @brief Initializes the interpreter
+        bool init();
+        /// @brief Closes the interpreter
+        void close();
         /// @brief Figure width getter
         /// @return Figure width
         int width() const { return _width; }
@@ -150,5 +154,7 @@ namespace plt
         std::string _ylabel;
         /// @brief figure title
         std::string _title;
+        /// global interpreter lock state
+        PyGILState_STATE _gstate;
     };
 }

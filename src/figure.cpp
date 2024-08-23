@@ -14,11 +14,54 @@ namespace plt
         _imageData.resize(3 * width * height);
     }
 
+    bool Figure::init()
+    {
+        Py_Initialize();
+        _gstate = PyGILState_Ensure();
+
+        // append the directory containing modules (including numpy and matplotlib) to the Python path
+        PyObject *sysPath = PySys_GetObject("path");
+        if (!sysPath)
+        {
+            std::cerr << "Failed to get sys.path\n";
+            return false;
+        }
+
+        constexpr char const* modulesFolderName {"python_modules"};
+        std::stringstream ss;
+        auto rootDir {std::filesystem::current_path()};
+
+        // if the build occurs on MacOs, then take the grandparent path
+#ifdef __APPLE__
+        rootDir = rootDir.parent_path().parent_path().parent_path();
+#endif
+        ss << rootDir.string() + "/";
+        ss << modulesFolderName << "/lib/python" << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << "/site-packages";
+
+        const auto dirPath = ss.str();
+        PyObject *modulesPath = PyUnicode_FromString(dirPath.c_str());
+        if (!modulesPath)
+        {
+            std::cerr << "Failed to create modules path\n";
+            return false;
+        }
+        int result = PyList_Append(sysPath, modulesPath);
+        Py_DECREF(modulesPath);
+        if (result == -1)
+        {
+            std::cerr << "Failed to append modules path to sys.path\n";
+            return false;
+        }
+        return true;
+    }
+
+    void Figure::close()
+    {
+        PyGILState_Release(_gstate);
+    }
+
     bool Figure::_initializeInterpreter() const
     {
-        // initialize interpreter
-        Py_Initialize();
-
         // append the directory containing modules (including numpy and matplotlib) to the Python path
         PyObject *sysPath = PySys_GetObject("path");
         if (!sysPath)
@@ -58,8 +101,8 @@ namespace plt
     bool Figure::build()
     {
         // initialize interpreter
-        if (!_initializeInterpreter())
-            return false;
+//        if (!_initializeInterpreter())
+//            return false;
         // automatic dpi adjustement. careful not to throw in some primes
         while (_width % _dpi != 0 || _height % _dpi != 0)
             _dpi--;
@@ -91,12 +134,7 @@ namespace plt
         PyObject *mainDict = PyModule_GetDict(mainModule);
         PyObject *pData = PyDict_GetItemString(mainDict, "img");
 
-        // build the image
-        bool rc = _buildImage(pData);
-
-        // close interpreter
-        Py_Finalize();
-        return rc;
+        return _buildImage(pData);;
     }
 
     void Figure::_setPixel(int i, int r, int g, int b)
