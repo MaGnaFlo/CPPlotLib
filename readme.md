@@ -28,7 +28,12 @@ auto range2 = x | std::views::transform([](double val)
 std::vector<double> y2(range2.begin(), range2.end());
 
 // figure
-plt::Figure figure{1200, 600, 100};
+plt::Figure figure{1200, 600, 100}; // 1200x600 with 100 dpi
+if (!figure.init()) {
+  std::cerr << "Error during initialization" << std::endl;
+  // return if needed
+}
+
 figure.addPlot(plt::PlotType::LINE, x, y);
 figure.addPlot(plt::PlotType::LINE, x, y2, {{"color", "\"b\""}});
 figure.addPlot(plt::PlotType::SCATTER, x, y2, {{"c", "\"yellow\""},
@@ -39,9 +44,15 @@ figure.setXLabel("Abscissa");
 figure.setYLabel("Ordinate");
 figure.setTitle("Example");
 
-// build image
-figure.build();
+if (!figure.build()) {
+  std::cerr << "Error during figure computation" << std::endl;
+  // return if needed
+}
+figure.close(); // necessary to ensure the GIL is released
+
 auto figure_data {figure.data()};
+int width {figure.width()};
+int height {figure.height()};
 
 // ...
 ```
@@ -56,6 +67,11 @@ std::vector<double> y_bar{{20, 10, 5, 15}};
 
 // figure
 plt::Figure figure{1200, 600, 100};
+if (!figure.init()) {
+  std::cerr << "Error during initialization" << std::endl;
+  // return if needed
+}
+
 figure.addPlot(plt::PlotType::BAR, x_bar, y_bar);
 figure.setGrid(true);
 figure.setXLabel("Abscissa");
@@ -63,8 +79,15 @@ figure.setYLabel("Ordinate");
 figure.setTitle("Example");
 
 // build image
-figure.build();
+if (!figure.build()) {
+  std::cerr << "Error during figure computation" << std::endl;
+  // return if needed
+}
+figure.close();
+
 auto figure_data {figure.data()};
+int width {figure.width()};
+int height {figure.height()};
 
 // ...
 ```
