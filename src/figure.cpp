@@ -100,9 +100,6 @@ namespace plt
 
     bool Figure::build()
     {
-        // initialize interpreter
-//        if (!_initializeInterpreter())
-//            return false;
         // automatic dpi adjustement. careful not to throw in some primes
         while (_width % _dpi != 0 || _height % _dpi != 0)
             _dpi--;
